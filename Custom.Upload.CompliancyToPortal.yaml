@@ -1,0 +1,36 @@
+name: Custom.Upload.CompliancyToPortal
+description: |
+  This server side event monitoring artifact waits for the Windows.Audit.SCA artifact
+  to be collected from endpoints and automatically uploads those to a web API.
+
+type: SERVER_EVENT
+
+sources:
+  - query: |
+      LET ROWS = SELECT {
+        SELECT ID, 
+        Title, 
+        str(str=ActualValue) AS ActualValue, 
+        str(str=ExpectedValue) AS ExpectedValue,
+        OK, 
+        FlowId, 
+        ClientId, 
+        client_info(client_id=ClientId).os_info.fqdn AS Fqdn
+      FROM source(
+        artifact='Custom.Windows.Audit.SCA',
+        client_id=ClientId, flow_id=FlowId)
+          } AS Row
+      FROM watch_monitoring(artifact="System.Flow.Completion")
+      WHERE Flow.artifacts_with_results =~ "Custom.Windows.Audit.SCA"
+
+      SELECT * FROM foreach(row=ROWS,
+        query={
+         SELECT * FROM http_client(
+           data=serialize(item=dict(
+           Customer="<CUSTOMER>",
+           token="<TOKEN>",
+           Audit=Row
+         )),
+        headers=dict(`Content-Type`="application/json"),
+        method="POST",
+        url="<URL>")})
