@@ -1,0 +1,652 @@
+name: Custom.Windows.Audit.SCA
+sources:
+- query: |
+    LET results <= SELECT * FROM chain(
+    id0_0={
+      SELECT 14500 AS ID,
+        '''Ensure 'Accounts: Limit local account use of blank passwords to console logon only' is set to 'Enabled' ''' AS Title,
+        get(field='''LimitBlankPasswordUse''') AS ActualValue,
+        '''1''' AS ExpectedValue,
+        int(int=get(field='''LimitBlankPasswordUse''')) = 1 AS OK
+      FROM read_reg_key(globs='''HKEY_LOCAL_MACHINE\System\CurrentControlSet\Control\Lsa''')
+    },     
+    
+    id1_0={
+      SELECT 14501 AS ID,
+        '''Ensure 'Audit: Shut down system immediately if unable to log security audits' is set to 'Disabled' ''' AS Title,
+        get(field='''CrashOnAuditFail''') AS ActualValue,
+        '''0''' AS ExpectedValue,
+        int(int=get(field='''CrashOnAuditFail''')) = 0 AS OK
+      FROM read_reg_key(globs='''HKEY_LOCAL_MACHINE\System\CurrentControlSet\Control\Lsa''')
+    },     
+    
+    id2_0={
+      SELECT 14502 AS ID,
+        '''Ensure 'Devices: Allowed to format and eject removable media' is set to 'Administrators' ''' AS Title,
+        get(field='''AllocateDASD''') AS ActualValue,
+        '''0''' AS ExpectedValue,
+        int(int=get(field='''AllocateDASD''')) = 0 AS OK
+      FROM read_reg_key(globs='''HKEY_LOCAL_MACHINE\Software\Microsoft\Windows NT\CurrentVersion\Winlogon''')
+    },     
+    
+    id3_0={
+      SELECT 14503 AS ID,
+        '''Ensure 'Devices: Prevent users from installing printer drivers' is set to 'Enabled' ''' AS Title,
+        get(field='''AddPrinterDrivers''') AS ActualValue,
+        '''1''' AS ExpectedValue,
+        int(int=get(field='''AddPrinterDrivers''')) = 1 AS OK
+      FROM read_reg_key(globs='''HKEY_LOCAL_MACHINE\System\CurrentControlSet\Control\Print\Providers\LanMan Print Services\Servers''')
+    },     
+    id4_0={
+      SELECT 14504 AS ID,
+        '''Ensure 'Domain member: Digitally encrypt or sign secure channel data (always)' is set to 'Enabled' ''' AS Title,
+        get(field='''RequireSignOrSeal''') AS ActualValue,
+        '''1''' AS ExpectedValue,
+        int(int=get(field='''RequireSignOrSeal''')) = 1 AS OK
+      FROM read_reg_key(globs='''HKEY_LOCAL_MACHINE\System\CurrentControlSet\Services\Netlogon\Parameters''')
+    }, 
+    
+    id5_0={
+      SELECT 14505 AS ID,
+        '''Ensure 'Domain member: Digitally encrypt secure channel data (when possible)' is set to 'Enabled' ''' AS Title,
+        get(field='''SealSecureChannel''') AS ActualValue,
+        '''1''' AS ExpectedValue,
+        int(int=get(field='''SealSecureChannel''')) = 1 AS OK
+      FROM read_reg_key(globs='''HKEY_LOCAL_MACHINE\System\CurrentControlSet\Services\Netlogon\Parameters''')
+    },     
+    
+    id6_0={
+      SELECT 14506 AS ID,
+        '''Ensure 'Domain member: Digitally sign secure channel data (when possible)' is set to 'Enabled' ''' AS Title,
+        get(field='''SignSecureChannel''') AS ActualValue,
+        '''1''' AS ExpectedValue,
+        int(int=get(field='''SignSecureChannel''')) = 1 AS OK
+      FROM read_reg_key(globs='''HKEY_LOCAL_MACHINE\System\CurrentControlSet\Services\Netlogon\Parameters''')
+    },     
+    
+    id7_0={
+      SELECT 14507 AS ID,
+        '''Ensure 'Domain member: Disable machine account password changes' is set to 'Disabled' ''' AS Title,
+        get(field='''DisablePasswordChange''') AS ActualValue,
+        '''0''' AS ExpectedValue,
+        int(int=get(field='''DisablePasswordChange''')) = 0 AS OK
+      FROM read_reg_key(globs='''HKEY_LOCAL_MACHINE\System\CurrentControlSet\Services\Netlogon\Parameters''')
+    },     
+    
+    id8_0={
+      SELECT 14508 AS ID,
+        '''Ensure 'Domain member: Require strong (Windows 2000 or later) session key' is set to 'Enabled' ''' AS Title,
+        get(field='''RequireStrongKey''') AS ActualValue,
+        '''1''' AS ExpectedValue,
+        int(int=get(field='''RequireStrongKey''')) = 1 AS OK
+      FROM read_reg_key(globs='''HKEY_LOCAL_MACHINE\System\CurrentControlSet\Services\Netlogon\Parameters''')
+    },     
+    
+    id9_0={
+      SELECT 14509 AS ID,
+        '''Ensure 'Interactive logon: Do not display last user name' is set to 'Enabled' ''' AS Title,
+        get(field='''DontDisplayLastUserName''') AS ActualValue,
+        '''1''' AS ExpectedValue,
+        int(int=get(field='''DontDisplayLastUserName''')) = 1 AS OK
+      FROM read_reg_key(globs='''HKEY_LOCAL_MACHINE\Software\Microsoft\Windows\CurrentVersion\Policies\System''')
+    },     
+    
+    id10_0={
+      SELECT 14510 AS ID,
+        '''Ensure 'Interactive logon: Do not require CTRL+ALT+DEL' is set to 'Disabled' ''' AS Title,
+        get(field='''DisableCAD''') AS ActualValue,
+        '''0''' AS ExpectedValue,
+        int(int=get(field='''DisableCAD''')) = 0 AS OK
+      FROM read_reg_key(globs='''HKEY_LOCAL_MACHINE\Software\Microsoft\Windows\CurrentVersion\Policies\System''')
+    },     
+    
+    id11_0={
+      SELECT 14511 AS ID,
+        '''Ensure 'Interactive logon: Prompt user to change password before expiration' is set to 'between 5 and 14 days' ''' AS Title,
+        get(field='''PasswordExpiryWarning''') AS ActualValue,
+        '''n:^(\d+) compare >= 5 && n:^(\d+) compare <= 14''' AS ExpectedValue,
+        int(int=get(field='''PasswordExpiryWarning''')) >= 5 AND int(int=get(field='''PasswordExpiryWarning''')) <= 14 AS OK
+      FROM read_reg_key(globs='''HKEY_LOCAL_MACHINE\Software\Microsoft\Windows NT\CurrentVersion\Winlogon''')
+    },     
+    
+    id12_0={
+      SELECT 14512 AS ID,
+        '''Ensure 'Interactive logon: Smart card removal behavior' is set to 'Lock Workstation' or higher ''' AS Title,
+        get(field='''ScRemoveOption''') AS ActualValue,
+        '''r:^1$|^2$|^3$''' AS ExpectedValue,
+        get(field='''ScRemoveOption''') =~ '''^1$|^2$|^3$''' AS OK
+      FROM read_reg_key(globs='''HKEY_LOCAL_MACHINE\Software\Microsoft\Windows NT\CurrentVersion\Winlogon''')
+    },     
+    
+    id13_0={
+      SELECT 14513 AS ID,
+        '''Ensure 'Microsoft network client: Digitally sign communications (always)' is set to 'Enabled' ''' AS Title,
+        get(field='''RequireSecuritySignature''') AS ActualValue,
+        '''1''' AS ExpectedValue,
+        int(int=get(field='''RequireSecuritySignature''')) = 1 AS OK
+      FROM read_reg_key(globs='''HKEY_LOCAL_MACHINE\System\CurrentControlSet\Services\LanmanWorkstation\Parameters''')
+    },     
+    
+    id14_0={
+      SELECT 14514 AS ID,
+        '''Ensure 'Microsoft network client: Digitally sign communications (if server agrees)' is set to 'Enabled' ''' AS Title,
+        get(field='''EnableSecuritySignature''') AS ActualValue,
+        '''1''' AS ExpectedValue,
+        int(int=get(field='''EnableSecuritySignature''')) = 1 AS OK
+      FROM read_reg_key(globs='''HKEY_LOCAL_MACHINE\System\CurrentControlSet\Services\LanmanWorkstation\Parameters''')
+    },     
+    
+    id15_0={
+      SELECT 14515 AS ID,
+        '''Ensure 'Microsoft network client: Send unencrypted password to third-party SMB servers' is set to 'Disabled' ''' AS Title,
+        get(field='''EnablePlainTextPassword''') AS ActualValue,
+        '''0''' AS ExpectedValue,
+        int(int=get(field='''EnablePlainTextPassword''')) = 0 AS OK
+      FROM read_reg_key(globs='''HKEY_LOCAL_MACHINE\System\CurrentControlSet\Services\LanmanWorkstation\Parameters''')
+    },     
+    
+    id16_0={
+      SELECT 14516 AS ID,
+        '''Ensure 'Microsoft network server: Amount of idle time required before suspending session' is set to '15 or fewer minute(s), but not 0' ''' AS Title,
+        get(field='''AutoDisconnect''') AS ActualValue,
+        '''n:^(\d+) compare <= 15''' AS ExpectedValue,
+        int(int=get(field='''AutoDisconnect''')) <= 15 AS OK
+      FROM read_reg_key(globs='''HKEY_LOCAL_MACHINE\System\CurrentControlSet\Services\LanManServer\Parameters''')
+    },     
+    
+    id17_0={
+      SELECT 14517 AS ID,
+        '''Ensure 'Microsoft network server: Digitally sign communications (always)' is set to 'Enabled' ''' AS Title,
+        get(field='''RequireSecuritySignature''') AS ActualValue,
+        '''1''' AS ExpectedValue,
+        int(int=get(field='''RequireSecuritySignature''')) = 1 AS OK
+      FROM read_reg_key(globs='''HKEY_LOCAL_MACHINE\System\CurrentControlSet\Services\LanManServer\Parameters''')
+    },     
+    
+    id18_0={
+      SELECT 14518 AS ID,
+        '''Ensure 'Microsoft network server: Digitally sign communications (if client agrees)' is set to 'Enabled' ''' AS Title,
+        get(field='''EnableSecuritySignature''') AS ActualValue,
+        '''1''' AS ExpectedValue,
+        int(int=get(field='''EnableSecuritySignature''')) = 1 AS OK
+      FROM read_reg_key(globs='''HKEY_LOCAL_MACHINE\System\CurrentControlSet\Services\LanManServer\Parameters''')
+    },     
+    
+    id19_0={
+      SELECT 14519 AS ID,
+        '''Ensure 'Network access: Do not allow anonymous enumeration of SAM accounts' is set to 'Enabled' ''' AS Title,
+        get(field='''RestrictAnonymousSAM''') AS ActualValue,
+        '''1''' AS ExpectedValue,
+        int(int=get(field='''RestrictAnonymousSAM''')) = 1 AS OK
+      FROM read_reg_key(globs='''HKEY_LOCAL_MACHINE\SYSTEM\CurrentControlSet\Control\Lsa''')
+    },     
+    
+    id20_0={
+      SELECT 14520 AS ID,
+        '''Ensure 'Network access: Do not allow storage of passwords and credentials for network authentication' is set to 'Enabled' ''' AS Title,
+        get(field='''DisableDomainCreds''') AS ActualValue,
+        '''1''' AS ExpectedValue,
+        int(int=get(field='''DisableDomainCreds''')) = 1 AS OK
+      FROM read_reg_key(globs='''HKEY_LOCAL_MACHINE\System\CurrentControlSet\Control\Lsa''')
+    },     
+    
+    id21_0={
+      SELECT 14521 AS ID,
+        '''Ensure 'Network access: Let Everyone permissions apply to anonymous users' is set to 'Disabled' ''' AS Title,
+        get(field='''EveryoneIncludesAnonymous''') AS ActualValue,
+        '''0''' AS ExpectedValue,
+        int(int=get(field='''EveryoneIncludesAnonymous''')) = 0 AS OK
+      FROM read_reg_key(globs='''HKEY_LOCAL_MACHINE\System\CurrentControlSet\Control\Lsa''')
+    },     
+    
+    id22_0={
+      SELECT 14522 AS ID,
+        '''Ensure 'Network access: Restrict anonymous access to Named Pipes and Shares' is set to 'Enabled' ''' AS Title,
+        get(field='''RestrictNullSessAccess''') AS ActualValue,
+        '''1''' AS ExpectedValue,
+        int(int=get(field='''RestrictNullSessAccess''')) = 1 AS OK
+      FROM read_reg_key(globs='''HKEY_LOCAL_MACHINE\System\CurrentControlSet\Services\LanManServer\Parameters''')
+    },     
+    
+    id24_0={
+      SELECT 14524 AS ID,
+        '''Ensure 'Network access: Sharing and security model for local accounts' is set to 'Classic - local users authenticate as themselves' ''' AS Title,
+        get(field='''ForceGuest''') AS ActualValue,
+        '''0''' AS ExpectedValue,
+        int(int=get(field='''ForceGuest''')) = 0 AS OK
+      FROM read_reg_key(globs='''HKEY_LOCAL_MACHINE\System\CurrentControlSet\Control\Lsa''')
+    },     
+    
+    id25_0={
+      SELECT 14525 AS ID,
+        '''Ensure 'Network security: Do not store LAN Manager hash value on next password change' is set to 'Enabled' ''' AS Title,
+        get(field='''NoLMHash''') AS ActualValue,
+        '''1''' AS ExpectedValue,
+        int(int=get(field='''NoLMHash''')) = 1 AS OK
+      FROM read_reg_key(globs='''HKEY_LOCAL_MACHINE\System\CurrentControlSet\Control\Lsa''')
+    },     
+    
+    id26_0={
+      SELECT 14526 AS ID,
+        '''Ensure 'Network security: LAN Manager authentication level' is set to 'Send NTLMv2 response only. Refuse LM & NTLM' ''' AS Title,
+        get(field='''LmCompatibilityLevel''') AS ActualValue,
+        '''5''' AS ExpectedValue,
+        int(int=get(field='''LmCompatibilityLevel''')) = 5 AS OK
+      FROM read_reg_key(globs='''HKEY_LOCAL_MACHINE\System\CurrentControlSet\Control\Lsa''')
+    },     
+    
+    id27_0={
+      SELECT 14527 AS ID,
+        '''Ensure 'Network security: LDAP client signing requirements' is set to 'Negotiate signing' or higher ''' AS Title,
+        get(field='''LDAPClientIntegrity''') AS ActualValue,
+        '''n:^(\d+) compare >= 1''' AS ExpectedValue,
+        int(int=get(field='''LDAPClientIntegrity''')) >= 1 AS OK
+      FROM read_reg_key(globs='''HKEY_LOCAL_MACHINE\System\CurrentControlSet\Services\LDAP''')
+    },     
+    
+    id28_0={
+      SELECT 14528 AS ID,
+        '''Ensure 'Network security: Minimum session security for NTLM SSP based (including secure RPC) clients' is set to 'Require NTLMv2 session security, Require 128-bit encryption' ''' AS Title,
+        get(field='''NTLMMinClientSec''') AS ActualValue,
+        '''537395200''' AS ExpectedValue,
+        int(int=get(field='''NTLMMinClientSec''')) = 537395200 AS OK
+      FROM read_reg_key(globs='''HKEY_LOCAL_MACHINE\System\CurrentControlSet\Control\Lsa\MSV1_0''')
+    },     
+    
+    id29_0={
+      SELECT 14529 AS ID,
+        '''Ensure 'Network security: Minimum session security for NTLM SSP based (including secure RPC) servers' is set to 'Require NTLMv2 session security, Require 128-bit encryption' ''' AS Title,
+        get(field='''NTLMMinServerSec''') AS ActualValue,
+        '''537395200''' AS ExpectedValue,
+        int(int=get(field='''NTLMMinServerSec''')) = 537395200 AS OK
+      FROM read_reg_key(globs='''HKEY_LOCAL_MACHINE\System\CurrentControlSet\Control\Lsa\MSV1_0''')
+    },     
+    
+    id30_0={
+      SELECT 14530 AS ID,
+        '''Ensure 'System objects: Require case insensitivity for non-Windows subsystems' is set to 'Enabled' ''' AS Title,
+        get(field='''ObCaseInsensitive''') AS ActualValue,
+        '''1''' AS ExpectedValue,
+        int(int=get(field='''ObCaseInsensitive''')) = 1 AS OK
+      FROM read_reg_key(globs='''HKEY_LOCAL_MACHINE\System\CurrentControlSet\Control\Session Manager\Kernel''')
+    },     
+    
+    id31_0={
+      SELECT 14531 AS ID,
+        '''Ensure 'System objects: Strengthen default permissions of internal system objects (e.g. Symbolic Links)' is set to 'Enabled' ''' AS Title,
+        get(field='''ProtectionMode''') AS ActualValue,
+        '''1''' AS ExpectedValue,
+        int(int=get(field='''ProtectionMode''')) = 1 AS OK
+      FROM read_reg_key(globs='''HKEY_LOCAL_MACHINE\System\CurrentControlSet\Control\Session Manager''')
+    },     
+    
+    id32_0={
+      SELECT 14532 AS ID,
+        '''Ensure 'Windows Firewall: Private: Firewall state' is set to 'On' ''' AS Title,
+        get(field='''EnableFirewall''') AS ActualValue,
+        '''1''' AS ExpectedValue,
+        int(int=get(field='''EnableFirewall''')) = 1 AS OK
+      FROM read_reg_key(globs='''HKEY_LOCAL_MACHINE\SOFTWARE\Policies\Microsoft\WindowsFirewall\PrivateProfile''')
+    },     
+    
+    id33_0={
+      SELECT 14533 AS ID,
+        '''Ensure 'Windows Firewall: Public: Firewall state' is set to 'On' ''' AS Title,
+        get(field='''EnableFirewall''') AS ActualValue,
+        '''1''' AS ExpectedValue,
+        int(int=get(field='''EnableFirewall''')) = 1 AS OK
+      FROM read_reg_key(globs='''HKEY_LOCAL_MACHINE\SOFTWARE\Policies\Microsoft\WindowsFirewall\PublicProfile''')
+    },     
+    
+    id34_0={
+      SELECT 14534 AS ID,
+        '''Ensure Registry tools set is enabled ''' AS Title,
+        get(field='''DisableRegistryTools''') AS ActualValue,
+        '''0''' AS ExpectedValue,
+        int(int=get(field='''DisableRegistryTools''')) = 0 AS OK
+      FROM read_reg_key(globs='''HKLM\Software\Microsoft\Windows\CurrentVersion\Policies\System''')
+    },     
+    
+    id35_0={
+      SELECT 14536 AS ID,
+        '''Ensure LM authentication is not allowed (disable weak passwords) ''' AS Title,
+        get(field='''LMCompatibilityLevel''') AS ActualValue,
+        '''r:^5$''' AS ExpectedValue,
+        get(field='''LMCompatibilityLevel''') =~ '''^5$''' AS OK
+      FROM read_reg_key(globs='''HKEY_LOCAL_MACHINE\SYSTEM\CurrentControlSet\Control\LSA''')
+    },     
+    
+    id36_0={
+      SELECT 14537 AS ID,
+        '''Ensure Firewall/Anti Virus notifications are enabled ''' AS Title,
+        get(field='''FirewallDisableNotify''') AS ActualValue,
+        '''0''' AS ExpectedValue,
+        int(int=get(field='''FirewallDisableNotify''')) = 0 AS OK
+      FROM read_reg_key(globs='''HKEY_LOCAL_MACHINE\SOFTWARE\Microsoft\Security Center''')
+    },     
+    
+    id37_0={
+      SELECT 14537 AS ID,
+        '''Ensure Firewall/Anti Virus notifications are enabled ''' AS Title,
+        get(field='''antivirusoverride''') AS ActualValue,
+        '''0''' AS ExpectedValue,
+        int(int=get(field='''antivirusoverride''')) = 0 AS OK
+      FROM read_reg_key(globs='''HKEY_LOCAL_MACHINE\SOFTWARE\Microsoft\Security Center''')
+    },     
+    
+    id37_1={
+      SELECT 14537 AS ID,
+        '''Ensure Firewall/Anti Virus notifications are enabled ''' AS Title,
+        get(field='''firewalldisablenotify''') AS ActualValue,
+        '''0''' AS ExpectedValue,
+        int(int=get(field='''firewalldisablenotify''')) = 0 AS OK
+      FROM read_reg_key(globs='''HKEY_LOCAL_MACHINE\SOFTWARE\Microsoft\Security Center''')
+    },     
+    
+    id37_2={
+      SELECT 14537 AS ID,
+        '''Ensure Firewall/Anti Virus notifications are enabled ''' AS Title,
+        get(field='''firewalldisableoverride''') AS ActualValue,
+        '''0''' AS ExpectedValue,
+        int(int=get(field='''firewalldisableoverride''')) = 0 AS OK
+      FROM read_reg_key(globs='''HKEY_LOCAL_MACHINE\SOFTWARE\Microsoft\Security Center''')
+    },     
+    
+    id38_0={
+      SELECT 14538 AS ID,
+        '''Ensure Microsoft Firewall is enabled ''' AS Title,
+        get(field='''enablefirewall''') AS ActualValue,
+        '''1''' AS ExpectedValue,
+        int(int=get(field='''enablefirewall''')) = 1 AS OK
+      FROM read_reg_key(globs='''HKEY_LOCAL_MACHINE\software\policies\microsoft\windowsfirewall\domainprofile''')
+    },     
+    
+    id39_0={
+      SELECT 14539 AS ID,
+        '''Ensure Null sessions are not allowed ''' AS Title,
+        get(field='''RestrictAnonymous''') AS ActualValue,
+        '''1''' AS ExpectedValue,
+        int(int=get(field='''RestrictAnonymous''')) = 1 AS OK
+      FROM read_reg_key(globs='''HKLM\System\CurrentControlSet\Control\Lsa''')
+    },     
+    
+    id40_0={
+      SELECT 14540 AS ID,
+        '''Ensure Turn off Windows Error reporting is enabled ''' AS Title,
+        get(field='''Disabled''') AS ActualValue,
+        '''1''' AS ExpectedValue,
+        int(int=get(field='''Disabled''')) = 1 AS OK
+      FROM read_reg_key(globs='''HKEY_LOCAL_MACHINE\SOFTWARE\Policies\Microsoft\Windows\Windows Error Reporting''')
+    },     
+    
+    id40_1={
+      SELECT 14540 AS ID,
+        '''Ensure Turn off Windows Error reporting is enabled ''' AS Title,
+        get(field='''DoReport''') AS ActualValue,
+        '''0''' AS ExpectedValue,
+        int(int=get(field='''DoReport''')) = 0 AS OK
+      FROM read_reg_key(globs='''HKEY_LOCAL_MACHINE\SOFTWARE\Policies\Microsoft\PCHealth\ErrorReporting''')
+    },     
+    
+    id41_1={
+      SELECT 14541 AS ID,
+        '''Ensure Automatic Logon is disabled ''' AS Title,
+        get(field='''AutoAdminLogon''') AS ActualValue,
+        '''0''' AS ExpectedValue,
+        int(int=get(field='''AutoAdminLogon''')) = 0 AS OK
+      FROM read_reg_key(globs='''HKLM\Software\Microsoft\Windows NT\CurrentVersion\Winlogon''')
+    },     
+    
+    id43_0={
+      SELECT 14543 AS ID,
+        '''Ensure 'MSS: (AutoAdminLogon) Enable Automatic Logon (not recommended)' is set to 'Disabled' ''' AS Title,
+        get(field='''AutoAdminLogon''') AS ActualValue,
+        '''0''' AS ExpectedValue,
+        int(int=get(field='''AutoAdminLogon''')) = 0 AS OK
+      FROM read_reg_key(globs='''HKEY_LOCAL_MACHINE\SOFTWARE\Microsoft\Windows NT\CurrentVersion\Winlogon''')
+    },     
+    
+    id44_0={
+      SELECT 14544 AS ID,
+        '''Ensure 'MSS: (DisableIPSourceRouting IPv6) IP source routing protection level (protects against packet spoofing)' is set to 'Enabled: Highest protection, source routing is completely disabled' ''' AS Title,
+        get(field='''DisableIPSourceRouting''') AS ActualValue,
+        '''2''' AS ExpectedValue,
+        int(int=get(field='''DisableIPSourceRouting''')) = 2 AS OK
+      FROM read_reg_key(globs='''HKEY_LOCAL_MACHINE\SYSTEM\CurrentControlSet\Services\Tcpip6\Parameters''')
+    },     
+    
+    id45_0={
+      SELECT 14545 AS ID,
+        '''Ensure 'MSS: (DisableIPSourceRouting) IP source routing protection level (protects against packet spoofing)' is set to 'Enabled: Highest protection, source routing is completely disabled' ''' AS Title,
+        get(field='''DisableIPSourceRouting''') AS ActualValue,
+        '''2''' AS ExpectedValue,
+        int(int=get(field='''DisableIPSourceRouting''')) = 2 AS OK
+      FROM read_reg_key(globs='''HKEY_LOCAL_MACHINE\SYSTEM\CurrentControlSet\Services\Tcpip\Parameters''')
+    },     
+    
+    id46_0={
+      SELECT 14546 AS ID,
+        '''Ensure 'MSS: (SafeDllSearchMode) Enable Safe DLL search mode (recommended)' is set to 'Enabled' ''' AS Title,
+        get(field='''SafeDllSearchMode''') AS ActualValue,
+        '''1''' AS ExpectedValue,
+        int(int=get(field='''SafeDllSearchMode''')) = 1 AS OK
+      FROM read_reg_key(globs='''HKEY_LOCAL_MACHINE\SYSTEM\CurrentControlSet\Control\Session Manager''')
+    },     
+    
+    id47_0={
+      SELECT 14547 AS ID,
+        '''Ensure 'MSS: (ScreenSaverGracePeriod) The time in seconds before the screen saver grace period expires (0 recommended)' is set to 'Enabled: 5 or fewer seconds' ''' AS Title,
+        get(field='''ScreenSaverGracePeriod''') AS ActualValue,
+        '''n:^(\d+) compare <= 5''' AS ExpectedValue,
+        int(int=get(field='''ScreenSaverGracePeriod''')) <= 5 AS OK
+      FROM read_reg_key(globs='''HKEY_LOCAL_MACHINE\SOFTWARE\Microsoft\Windows NT\CurrentVersion\Winlogon''')
+    },     
+    
+    id48_0={
+      SELECT 14548 AS ID,
+        '''Ensure 'MSS: (WarningLevel) Percentage threshold for the security event log at which the system will generate a warning' is set to 'Enabled: 90% or less' ''' AS Title,
+        get(field='''WarningLevel''') AS ActualValue,
+        '''n:^(\d+) compare <= 90''' AS ExpectedValue,
+        int(int=get(field='''WarningLevel''')) <= 90 AS OK
+      FROM read_reg_key(globs='''HKEY_LOCAL_MACHINE\SYSTEM\CurrentControlSet\Services\Eventlog\Security''')
+    },     
+    
+    id49_0={
+      SELECT 14549 AS ID,
+        '''Ensure 'Configure registry policy processing: Do not apply during periodic background processing' is set to 'Enabled: FALSE' ''' AS Title,
+        get(field='''NoBackgroundPolicy''') AS ActualValue,
+        '''0''' AS ExpectedValue,
+        int(int=get(field='''NoBackgroundPolicy''')) = 0 AS OK
+      FROM read_reg_key(globs='''HKEY_LOCAL_MACHINE\SOFTWARE\Policies\Microsoft\Windows\Group Policy\{35378EAC-683F-11D2-A89A-00C04FBBCFA2}''')
+    },     
+    
+    id50_0={
+      SELECT 14550 AS ID,
+        '''Ensure 'Turn off downloading of print drivers over HTTP' is set to 'Enabled' ''' AS Title,
+        get(field='''DisableWebPnPDownload''') AS ActualValue,
+        '''1''' AS ExpectedValue,
+        int(int=get(field='''DisableWebPnPDownload''')) = 1 AS OK
+      FROM read_reg_key(globs='''HKEY_LOCAL_MACHINE\SOFTWARE\Policies\Microsoft\Windows NT\Printers''')
+    },     
+    
+    id51_0={
+      SELECT 14551 AS ID,
+        '''Ensure 'Turn off Internet download for Web publishing and online ordering wizards' is set to 'Enabled' ''' AS Title,
+        get(field='''NoWebServices''') AS ActualValue,
+        '''1''' AS ExpectedValue,
+        int(int=get(field='''NoWebServices''')) = 1 AS OK
+      FROM read_reg_key(globs='''HKEY_LOCAL_MACHINE\SOFTWARE\Microsoft\Windows\CurrentVersion\Policies\Explorer''')
+    },     
+    
+    id52_0={
+      SELECT 14552 AS ID,
+        '''Ensure 'Turn off printing over HTTP' is set to 'Enabled' ''' AS Title,
+        get(field='''DisableHTTPPrinting''') AS ActualValue,
+        '''1''' AS ExpectedValue,
+        int(int=get(field='''DisableHTTPPrinting''')) = 1 AS OK
+      FROM read_reg_key(globs='''HKEY_LOCAL_MACHINE\SOFTWARE\Policies\Microsoft\Windows NT\Printers''')
+    },     
+    
+    id53_0={
+      SELECT 14553 AS ID,
+        '''Ensure 'Configure Offer Remote Assistance' is set to 'Disabled' ''' AS Title,
+        get(field='''fAllowUnsolicited''') AS ActualValue,
+        '''0''' AS ExpectedValue,
+        int(int=get(field='''fAllowUnsolicited''')) = 0 AS OK
+      FROM read_reg_key(globs='''HKEY_LOCAL_MACHINE\SOFTWARE\Policies\Microsoft\Windows NT\Terminal Services''')
+    },     
+    
+    id54_0={
+      SELECT 14554 AS ID,
+        '''Ensure 'Configure Solicited Remote Assistance' is set to 'Disabled' ''' AS Title,
+        get(field='''fAllowToGetHelp''') AS ActualValue,
+        '''0''' AS ExpectedValue,
+        int(int=get(field='''fAllowToGetHelp''')) = 0 AS OK
+      FROM read_reg_key(globs='''HKEY_LOCAL_MACHINE\SOFTWARE\Policies\Microsoft\Windows NT\Terminal Services''')
+    },     
+    
+    id55_0={
+      SELECT 14555 AS ID,
+        '''Ensure 'Turn off Autoplay' is set to 'Enabled: All drives' ''' AS Title,
+        get(field='''NoDriveTypeAutoRun''') AS ActualValue,
+        '''255''' AS ExpectedValue,
+        int(int=get(field='''NoDriveTypeAutoRun''')) = 255 AS OK
+      FROM read_reg_key(globs='''HKEY_LOCAL_MACHINE\SOFTWARE\Microsoft\Windows\CurrentVersion\Policies\Explorer''')
+    },     
+    
+    id56_0={
+      SELECT 14556 AS ID,
+        '''Ensure 'Do not allow passwords to be saved' is set to 'Enabled' ''' AS Title,
+        get(field='''DisablePasswordSaving''') AS ActualValue,
+        '''1''' AS ExpectedValue,
+        int(int=get(field='''DisablePasswordSaving''')) = 1 AS OK
+      FROM read_reg_key(globs='''HKEY_LOCAL_MACHINE\SOFTWARE\Policies\Microsoft\Windows NT\Terminal Services''')
+    },     
+    
+    id57_0={
+      SELECT 14557 AS ID,
+        '''Ensure 'Do not allow drive redirection' is set to 'Enabled' ''' AS Title,
+        get(field='''fDisableCdm''') AS ActualValue,
+        '''1''' AS ExpectedValue,
+        int(int=get(field='''fDisableCdm''')) = 1 AS OK
+      FROM read_reg_key(globs='''HKEY_LOCAL_MACHINE\SOFTWARE\Policies\Microsoft\Windows NT\Terminal Services''')
+    },     
+    
+    id58_0={
+      SELECT 14558 AS ID,
+        '''Ensure 'Always prompt for password upon connection' is set to 'Enabled' ''' AS Title,
+        get(field='''fPromptForPassword''') AS ActualValue,
+        '''1''' AS ExpectedValue,
+        int(int=get(field='''fPromptForPassword''')) = 1 AS OK
+      FROM read_reg_key(globs='''HKEY_LOCAL_MACHINE\SOFTWARE\Policies\Microsoft\Windows NT\Terminal Services''')
+    },     
+    
+    id59_0={
+      SELECT 14559 AS ID,
+        '''Ensure 'Set client connection encryption level' is set to 'Enabled: High Level' ''' AS Title,
+        get(field='''MinEncryptionLevel''') AS ActualValue,
+        '''3''' AS ExpectedValue,
+        int(int=get(field='''MinEncryptionLevel''')) = 3 AS OK
+      FROM read_reg_key(globs='''HKEY_LOCAL_MACHINE\SOFTWARE\Policies\Microsoft\Windows NT\Terminal Services''')
+    },     
+    
+    id60_0={
+      SELECT 14560 AS ID,
+        '''Ensure 'Always install with elevated privileges' is set to 'Disabled' ''' AS Title,
+        get(field='''AlwaysInstallElevated''') AS ActualValue,
+        '''0''' AS ExpectedValue,
+        int(int=get(field='''AlwaysInstallElevated''')) = 0 AS OK
+      FROM read_reg_key(globs='''HKEY_LOCAL_MACHINE\SOFTWARE\Policies\Microsoft\Windows\Installer''')
+    },     
+    
+    id61_0={
+      SELECT 14561 AS ID,
+        '''Ensure 'Configure Automatic Updates' is set to 'Enabled' ''' AS Title,
+        get(field='''NoAutoUpdate''') AS ActualValue,
+        '''0''' AS ExpectedValue,
+        int(int=get(field='''NoAutoUpdate''')) = 0 AS OK
+      FROM read_reg_key(globs='''HKEY_LOCAL_MACHINE\SOFTWARE\Policies\Microsoft\Windows\WindowsUpdate\AU''')
+    },     
+    
+    id62_0={
+      SELECT 14562 AS ID,
+        '''Ensure 'No auto-restart with logged on users for scheduled automatic updates installations' is set to 'Disabled' ''' AS Title,
+        get(field='''NoAutoRebootWithLoggedOnUsers''') AS ActualValue,
+        '''0''' AS ExpectedValue,
+        int(int=get(field='''NoAutoRebootWithLoggedOnUsers''')) = 0 AS OK
+      FROM read_reg_key(globs='''HKEY_LOCAL_MACHINE\SOFTWARE\Policies\Microsoft\Windows\WindowsUpdate\AU''')
+    },     
+    
+    id63_0={
+      SELECT 14563 AS ID,
+        '''Ensure 'MSS: (TcpMaxDataRetransmissions IPv6) How many times unacknowledged data is retransmitted' is set to 'Enabled: 3' ''' AS Title,
+        get(field='''TcpMaxDataRetransmissions''') AS ActualValue,
+        '''3''' AS ExpectedValue,
+        int(int=get(field='''TcpMaxDataRetransmissions''')) = 3 AS OK
+      FROM read_reg_key(globs='''HKEY_LOCAL_MACHINE\SYSTEM\CurrentControlSet\Services\TCPIP6\Parameters''')
+    },     
+    
+    id64_0={
+      SELECT 14564 AS ID,
+        '''Ensure 'MSS: (TcpMaxDataRetransmissions) How many times unacknowledged data is retransmitted' is set to 'Enabled: 3' ''' AS Title,
+        get(field='''TcpMaxDataRetransmissions''') AS ActualValue,
+        '''3''' AS ExpectedValue,
+        int(int=get(field='''TcpMaxDataRetransmissions''')) = 3 AS OK
+      FROM read_reg_key(globs='''HKEY_LOCAL_MACHINE\SYSTEM\CurrentControlSet\Services\Tcpip\Parameters''')
+    },     
+    
+    id65_0={
+      SELECT 14565 AS ID,
+        '''Ensure 'Turn off Search Companion content file updates' is set to 'Enabled' ''' AS Title,
+        get(field='''DisableContentFileUpdates''') AS ActualValue,
+        '''1''' AS ExpectedValue,
+        int(int=get(field='''DisableContentFileUpdates''')) = 1 AS OK
+      FROM read_reg_key(globs='''HKEY_LOCAL_MACHINE\SOFTWARE\Policies\Microsoft\SearchCompanion''')
+    },     
+    
+    id66_0={
+      SELECT 14566 AS ID,
+        '''Ensure 'Turn off the "Publish to Web" task for files and folders' is set to 'Enabled' ''' AS Title,
+        get(field='''NoPublishingWizard''') AS ActualValue,
+        '''1''' AS ExpectedValue,
+        int(int=get(field='''NoPublishingWizard''')) = 1 AS OK
+      FROM read_reg_key(globs='''HKEY_LOCAL_MACHINE\SOFTWARE\Microsoft\Windows\CurrentVersion\Policies\Explorer''')
+    },     
+    
+    id67_0={
+      SELECT 14567 AS ID,
+        '''Ensure 'Turn off the Windows Messenger Customer Experience Improvement Program' is set to 'Enabled' ''' AS Title,
+        get(field='''CEIP''') AS ActualValue,
+        '''2''' AS ExpectedValue,
+        int(int=get(field='''CEIP''')) = 2 AS OK
+      FROM read_reg_key(globs='''HKEY_LOCAL_MACHINE\SOFTWARE\Policies\Microsoft\Messenger\Client''')
+    },     
+    
+    id68_0={
+      SELECT 14568 AS ID,
+        '''Ensure 'Turn off Windows Error Reporting' is set to 'Enabled' ''' AS Title,
+        get(field='''Disabled''') AS ActualValue,
+        '''1''' AS ExpectedValue,
+        int(int=get(field='''Disabled''')) = 1 AS OK
+      FROM read_reg_key(globs='''HKEY_LOCAL_MACHINE\SOFTWARE\Policies\Microsoft\Windows\Windows Error Reporting''')
+    },     
+    
+    id69_0={
+      SELECT 14569 AS ID,
+        '''Ensure 'Enable RPC Endpoint Mapper Client Authentication' is set to 'Enabled' ''' AS Title,
+        get(field='''EnableAuthEpResolution''') AS ActualValue,
+        '''1''' AS ExpectedValue,
+        int(int=get(field='''EnableAuthEpResolution''')) = 1 AS OK
+      FROM read_reg_key(globs='''HKEY_LOCAL_MACHINE\SOFTWARE\Policies\Microsoft\Windows NT\Rpc''')
+    },     
+    
+    id70_0={
+      SELECT 14570 AS ID,
+        '''Ensure 'Restrict Unauthenticated RPC clients' is set to 'Enabled: Authenticated' ''' AS Title,
+        get(field='''RestrictRemoteClients''') AS ActualValue,
+        '''1''' AS ExpectedValue,
+        int(int=get(field='''RestrictRemoteClients''')) = 1 AS OK
+      FROM read_reg_key(globs='''HKEY_LOCAL_MACHINE\SOFTWARE\Policies\Microsoft\Windows NT\Rpc''')
+      })
+
+    SELECT * FROM results
